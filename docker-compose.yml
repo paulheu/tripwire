@@ -50,7 +50,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
       # Let Traefik know container listens on port 80 internally
-      - "traefik.http.services.nginx.loadbalancer.server.port=80" 
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
     volumes:
       - "./:/opt/app"
 
@@ -104,7 +104,7 @@ services:
       - mysql
     networks:
       - tripwire
-    environment:  
+    environment:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_ROOT_USER=root
@@ -120,4 +120,3 @@ volumes:
 networks:
   web:
   tripwire:
-  

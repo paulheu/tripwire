@@ -1,4 +1,5 @@
 <?php
+
 try {
     $mysql = new PDO(
         'mysql:host=mysql;dbname=tripwire_database;charset=utf8',
