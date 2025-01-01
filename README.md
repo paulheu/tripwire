@@ -67,9 +67,10 @@ Setup:
       - MYSQL_USER="any non root user you want, also no quotes"
       - MYSQL_PASSWORD="any non root password you want, still no quotes"
       - DB_ROOT_PASS="same root password as before, still no quotes"
+```
 
 **SSO**
-
+```
 - Create an EVE developer application via https://developers.eveonline.com/applications
 - EVE SSO `Callback URL` should be: `https://your-domain.com/index.php?mode=sso`
 - Use the following scopes:
