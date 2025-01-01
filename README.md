@@ -110,15 +110,21 @@ touch traefik-data/acme.json
 chmod 600 traefik-data/acme.json
 ```
 
+**CRON**
+```
+crontab -e
+
+paste this into cron:
+0 * * * * docker exec -t php-fpm php /opt/app/system_activity.cron.php
+*/3 * * * * docker exec -t  php-fpm php /opt/app/account_update.cron.php
+```
+
+
 **General**
-
-To start the stack run `docker-compose up -d --build`
 To view logs in real time run `docker-compose logs -f`
+To start the stack run `docker-compose up -d --build`
 
-_TODO: Use either a docker cron or use docker exec commands in crontab_
 
-- Setup a CRON or schedule for `system_activity.cron.php` to run at the top of every hour. CRON: `0 * * * * php /dir/to/system_activity.cron.php`
-- Setup a CRON or schedule for `account_update.cron.php` to run every 3 minutes or however often you want to check for corporation changes. CRON: `*/3 * * * * php /dir/to/account_update.cron.php`
 
 ### Contribution guidelines
 
