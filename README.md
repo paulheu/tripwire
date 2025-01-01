@@ -82,12 +82,14 @@ edit the following items with your information
     - esi-characters.read_titles.v1
     - esi-search.search_structures.v1
 ```
+
 **db.inc.php**
 ```
   - `host=` should be `mysql`
   - `dbname=` should be `tripwire_database`
   - `update `username` and `password` with the user name and password from docker-compose.yml
 ```
+
 **config.php**
 ```
   - `EVE_DUMP` matches SDE_DB in docker-compose
@@ -97,9 +99,9 @@ edit the following items with your information
 
 **Traefik Acme**
 ```
-  mkdir -p traefik-data
-  touch traefik-data/acme.json
-  chmod 600 traefik-data/acme.json
+mkdir -p traefik-data
+touch traefik-data/acme.json
+chmod 600 traefik-data/acme.json
 ```
 
 **General**
