@@ -31,23 +31,24 @@ services:
   nginx:
     build: .docker/nginx
     container_name: nginx
-    ports:
-      - 8081:80
     networks:
       - web
       - tripwire
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=tripwire_web"
+
       # Router rule for domain
       - "traefik.http.routers.nginx.rule=Host(`your domain`)"
       - "traefik.http.routers.nginx.entrypoints=websecure"
       - "traefik.http.routers.nginx.tls.certresolver=myresolver"
+
       # Fallback to plain HTTP -> redirect to HTTPS
       - "traefik.http.routers.nginx_http.rule=Host(`your domain`)"
       - "traefik.http.routers.nginx_http.entrypoints=web"
       - "traefik.http.routers.nginx_http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
       # Let Traefik know container listens on port 80 internally
       - "traefik.http.services.nginx.loadbalancer.server.port=80" 
     volumes:
