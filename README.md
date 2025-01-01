@@ -46,7 +46,6 @@ Setup:
 - If you are using SELinux: Tripwire needs access to the 'cache' directory inside the deployment directory, usually /var/www/tripwire. You need to make this a write-access directory via SELinux labelling: `semanage fcontext -a -t httpd_sys_rw_content_t "/var/www/tripwire/cache(/.*)?"` - then relabel the directory `restorecon -R -v /var/www/tripwire`
 
 ### Setup guide for Docker
-
 - Install Docker for your environment: https://www.docker.com/
 - Setup Developer application on Eve developers
 - Configure your domain registrar with a record pointed to the vm you are using -- ensure port 80/443 are open (80 can be closed after traefik setup)
@@ -58,44 +57,49 @@ Setup:
 - Prep traefik acme file
 
 **docker-compose.yml**
-- edit the following items with your information
+edit the following items with your information
 ```
-      - "--certificatesresolvers.myresolver.acme.email=your@email.com"
-      - "traefik.http.routers.nginx.rule=Host(`your domain`)"
-      - "traefik.http.routers.nginxweb_http.rule=Host(`your domain`)"
-      - MYSQL_ROOT_PASSWORD="any root password you want, don't use quotes"
-      - MYSQL_USER="any non root user you want, also no quotes"
-      - MYSQL_PASSWORD="any non root password you want, still no quotes"
-      - DB_ROOT_PASS="same root password as before, still no quotes"
+  - "--certificatesresolvers.myresolver.acme.email=your@email.com"
+  - "traefik.http.routers.nginx.rule=Host(`your domain`)"
+  - "traefik.http.routers.nginxweb_http.rule=Host(`your domain`)"
+  - MYSQL_ROOT_PASSWORD="any root password you want, don't use quotes"
+  - MYSQL_USER="any non root user you want, also no quotes"
+  - MYSQL_PASSWORD="any non root password you want, still no quotes"
+  - DB_ROOT_PASS="same root password as before, still no quotes"
 ```
 
 **SSO**
 ```
-- Create an EVE developer application via https://developers.eveonline.com/applications
-- EVE SSO `Callback URL` should be: `https://your-domain.com/index.php?mode=sso`
-- Use the following scopes:
-  - esi-location.read_location.v1
-  - esi-location.read_ship_type.v1
-  - esi-ui.open_window.v1
-  - esi-ui.write_waypoint.v1
-  - esi-characters.read_corporation_roles.v1
-  - esi-location.read_online.v1
-  - esi-characters.read_titles.v1
-  - esi-search.search_structures.v1
- 
-**db.inc.php**
-- `host=` should be `mysql`
-- `dbname=` should be `tripwire_database`
-- `update `username` and `password` with the user name and password from docker-compose.yml
-**config.php**
-- `EVE_DUMP` matches SDE_DB in docker-compose
-- `CDN_DOMAIN` this should match the domain name in your docker-compose
-- `EVE_SSO_CLIENT`, `EVE_SSO_SECRET`, and `EVE_SSO_REDIRECT` should be updated to match the EVE SSO application
-** Traefik Acme **
+  - Create an EVE developer application via https://developers.eveonline.com/applications
+  - EVE SSO `Callback URL` should be: `https://your-domain.com/index.php?mode=sso`
+  - Use the following scopes:
+    - esi-location.read_location.v1
+    - esi-location.read_ship_type.v1
+    - esi-ui.open_window.v1
+    - esi-ui.write_waypoint.v1
+    - esi-characters.read_corporation_roles.v1
+    - esi-location.read_online.v1
+    - esi-characters.read_titles.v1
+    - esi-search.search_structures.v1
 ```
-mkdir -p traefik-data
-touch traefik-data/acme.json
-chmod 600 traefik-data/acme.json
+**db.inc.php**
+```
+  - `host=` should be `mysql`
+  - `dbname=` should be `tripwire_database`
+  - `update `username` and `password` with the user name and password from docker-compose.yml
+```
+**config.php**
+```
+  - `EVE_DUMP` matches SDE_DB in docker-compose
+  - `CDN_DOMAIN` this should match the domain name in your docker-compose
+  - `EVE_SSO_CLIENT`, `EVE_SSO_SECRET`, and `EVE_SSO_REDIRECT` should be updated to match the EVE SSO application
+```
+
+**Traefik Acme**
+```
+  mkdir -p traefik-data
+  touch traefik-data/acme.json
+  chmod 600 traefik-data/acme.json
 ```
 
 **General**
