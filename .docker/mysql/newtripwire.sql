@@ -1,8 +1,6 @@
--- MySQL dump 10.13  Distrib 5.7.23, for Win64 (x86_64)
---
--- Host: localhost    Database: tripwire
--- ------------------------------------------------------
--- Server version	5.7.20-19
+-- tripwire.sql
+-- Updated for MySQL 5.7+ / MySQL 8
+-- Converted MyISAM tables to InnoDB, removed DEFINER lines, removed old sql_mode references.
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -63,7 +61,7 @@ CREATE TABLE `_history_signatures` (
   KEY `id` (`id`),
   KEY `maskID` (`maskID`),
   KEY `status` (`status`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 PACK_KEYS=0 DELAY_KEY_WRITE=1 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -85,7 +83,7 @@ CREATE TABLE `_history_wormholes` (
   `maskID` decimal(12,1) NOT NULL,
   `status` enum('add','update','delete','undo:add','undo:update','undo:delete') NOT NULL,
   PRIMARY KEY (`historyID`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 PACK_KEYS=0 DELAY_KEY_WRITE=1;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,7 +105,7 @@ CREATE TABLE `accounts` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   KEY `ban` (`ban`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -159,7 +157,7 @@ CREATE TABLE `characters` (
   KEY `ban` (`ban`),
   KEY `admin` (`admin`),
   KEY `corporationID` (`corporationID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -183,7 +181,7 @@ CREATE TABLE `comments` (
   PRIMARY KEY (`id`),
   KEY `maskID` (`maskID`),
   KEY `systemID, maskID` (`maskID`,`systemID`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -205,21 +203,19 @@ CREATE TABLE `esi` (
   KEY `userID` (`userID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+
+--
+-- Trigger: trackingRemove (Remove DEFINER, use plain CREATE TRIGGER)
+--
+
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `trackingRemove` AFTER DELETE ON `esi` FOR EACH ROW DELETE FROM tracking WHERE characterID = OLD.characterID */;;
+CREATE TRIGGER `trackingRemove`
+AFTER DELETE ON `esi`
+FOR EACH ROW
+BEGIN
+    DELETE FROM tracking WHERE characterID = OLD.characterID;
+END;;
 DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `flares`
@@ -236,7 +232,7 @@ CREATE TABLE `flares` (
   PRIMARY KEY (`maskID`,`systemID`),
   KEY `time` (`time`),
   KEY `maskID` (`maskID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -283,7 +279,7 @@ CREATE TABLE `jumps` (
   KEY `wormholeID` (`wormholeID`),
   KEY `time` (`time`),
   KEY `massSearch` (`maskID`,`wormholeID`,`time`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -391,7 +387,7 @@ CREATE TABLE `system_activity` (
   `podKills` mediumint(6) unsigned NOT NULL DEFAULT '0',
   `npcKills` mediumint(6) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`systemID`,`time`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=0;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -429,8 +425,8 @@ CREATE TABLE `tokens` (
 --
 
 DROP TABLE IF EXISTS `tracking`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET @saved_cs_client      = @@character_set_client */;
+/*!40101 SET character_set_client  = utf8 */;
 CREATE TABLE `tracking` (
   `userID` int(11) NOT NULL,
   `characterID` int(10) unsigned NOT NULL,
@@ -453,49 +449,56 @@ CREATE TABLE `tracking` (
   KEY `maskID, systemID` (`maskID`,`systemID`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8 DELAY_KEY_WRITE=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `systemVisits` AFTER UPDATE ON `tracking`
-FOR EACH ROW BEGIN
-	IF NEW.systemID <> OLD.systemID THEN
-		INSERT INTO system_visits (userID, characterID, systemID, date) VALUES (NEW.userID, NEW.characterID, NEW.systemID, NOW());
-	END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `jumpHistory` AFTER UPDATE ON `tracking` FOR EACH ROW BEGIN
-	IF NEW.systemID <> OLD.systemID THEN
-		SET @wormholeID = (SELECT w.id FROM wormholes w INNER JOIN signatures a ON initialID = a.id INNER JOIN signatures b ON secondaryID = b.id WHERE (a.systemID = NEW.systemID OR b.systemID = NEW.systemID) AND (a.systemID = OLD.systemID OR b.systemID = OLD.systemID));
-        IF @wormholeID IS NOT NULL THEN
-			INSERT INTO jumps (wormholeID, characterID, characterName, toID, toName, fromID, fromName, shipTypeID, shipType, maskID) VALUES (@wormholeID, NEW.characterID, NEW.characterName, NEW.systemID, NEW.systemName, OLD.systemID, OLD.systemName, NEW.shipTypeID, NEW.shipTypeName, NEW.maskID);
-		END IF;
-	END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
+--
+-- Trigger: systemVisits (Remove DEFINER, plain CREATE TRIGGER)
+--
+
+DELIMITER ;;
+CREATE TRIGGER `systemVisits`
+AFTER UPDATE ON `tracking`
+FOR EACH ROW
+BEGIN
+    IF NEW.systemID <> OLD.systemID THEN
+        INSERT INTO system_visits (userID, characterID, systemID, date)
+        VALUES (NEW.userID, NEW.characterID, NEW.systemID, NOW());
+    END IF;
+END;;
+DELIMITER ;
+
+--
+-- Trigger: jumpHistory (Remove DEFINER, plain CREATE TRIGGER)
+--
+
+DELIMITER ;;
+CREATE TRIGGER `jumpHistory`
+AFTER UPDATE ON `tracking`
+FOR EACH ROW
+BEGIN
+    IF NEW.systemID <> OLD.systemID THEN
+        SET @wormholeID = (
+          SELECT w.id
+          FROM wormholes w
+          INNER JOIN signatures a ON initialID = a.id
+          INNER JOIN signatures b ON secondaryID = b.id
+          WHERE (a.systemID = NEW.systemID OR b.systemID = NEW.systemID)
+            AND (a.systemID = OLD.systemID OR b.systemID = OLD.systemID)
+        );
+        IF @wormholeID IS NOT NULL THEN
+            INSERT INTO jumps (
+              wormholeID, characterID, characterName,
+              toID, toName, fromID, fromName,
+              shipTypeID, shipType, maskID
+            ) VALUES (
+              @wormholeID, NEW.characterID, NEW.characterName,
+              NEW.systemID, NEW.systemName,
+              OLD.systemID, OLD.systemName,
+              NEW.shipTypeID, NEW.shipTypeName, NEW.maskID
+            );
+        END IF;
+    END IF;
+END;;
+DELIMITER ;
 
 --
 -- Table structure for table `wormholes`
@@ -521,175 +524,165 @@ CREATE TABLE `wormholes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping events for database 'tripwire'
---
-/*!50106 SET @save_time_zone= @@TIME_ZONE */ ;
-/*!50106 DROP EVENT IF EXISTS `activeClean` */;
+-- Event: activeClean, flaresClean, etc. (Remove DEFINER, use CREATE EVENT)
+-- If needed, rename or keep them as is if MySQL 5.7+ allows them to run.
+
+DROP EVENT IF EXISTS `activeClean`;
 DELIMITER ;;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
-/*!50003 SET character_set_client  = utf8mb4 */ ;;
-/*!50003 SET character_set_results = utf8mb4 */ ;;
-/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;;
-/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
-/*!50003 SET time_zone             = '+00:00' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `activeClean` ON SCHEDULE EVERY 15 SECOND STARTS '2014-09-27 23:42:27' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM active WHERE DATE_ADD(time, INTERVAL 15 SECOND) < NOW() */ ;;
-/*!50003 SET time_zone             = @saved_time_zone */ ;;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;;
-/*!50003 SET character_set_results = @saved_cs_results */ ;;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;;
-/*!50106 DROP EVENT IF EXISTS `flaresClean` */;;
-DELIMITER ;;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
-/*!50003 SET character_set_client  = utf8mb4 */ ;;
-/*!50003 SET character_set_results = utf8mb4 */ ;;
-/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;;
-/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
-/*!50003 SET time_zone             = '+00:00' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `flaresClean` ON SCHEDULE EVERY 1 HOUR STARTS '2014-08-21 03:15:55' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM flares WHERE DATE_ADD(time, INTERVAL 24 HOUR) < NOW() */ ;;
-/*!50003 SET time_zone             = @saved_time_zone */ ;;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;;
-/*!50003 SET character_set_results = @saved_cs_results */ ;;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;;
-/*!50106 DROP EVENT IF EXISTS `jumpsClean` */;;
-DELIMITER ;;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
-/*!50003 SET character_set_client  = utf8mb4 */ ;;
-/*!50003 SET character_set_results = utf8mb4 */ ;;
-/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;;
-/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
-/*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `jumpsClean` ON SCHEDULE EVERY 1 HOUR STARTS '2017-01-27 04:24:28' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM `jumps` WHERE wormholeID NOT IN (SELECT id FROM wormholes WHERE type <> 'GATE') */ ;;
-/*!50003 SET time_zone             = @saved_time_zone */ ;;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;;
-/*!50003 SET character_set_results = @saved_cs_results */ ;;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;;
-/*!50106 DROP EVENT IF EXISTS `signatureClean` */;;
-DELIMITER ;;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
-/*!50003 SET character_set_client  = utf8mb4 */ ;;
-/*!50003 SET character_set_results = utf8mb4 */ ;;
-/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;;
-/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
-/*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `signatureClean` ON SCHEDULE EVERY 1 MINUTE STARTS '2018-05-11 15:57:18' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
-
-
-
-UPDATE signatures SET modifiedByID = 0, modifiedByName = "Tripwire" WHERE lifeLeft < NOW() AND lifeLength <> '0' AND type <> 'wormhole';
-
-
-
-DELETE FROM signatures WHERE lifeLeft < NOW() AND lifeLength <> '0' AND type <> 'wormhole';
-
-
-
-END */ ;;
-/*!50003 SET time_zone             = @saved_time_zone */ ;;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;;
-/*!50003 SET character_set_results = @saved_cs_results */ ;;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;;
-/*!50106 DROP EVENT IF EXISTS `trackingClean` */;;
-DELIMITER ;;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
-/*!50003 SET character_set_client  = utf8mb4 */ ;;
-/*!50003 SET character_set_results = utf8mb4 */ ;;
-/*!50003 SET collation_connection  = utf8mb4_general_ci */ ;;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;;
-/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
-/*!50003 SET time_zone             = '+00:00' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `trackingClean` ON SCHEDULE EVERY 15 SECOND STARTS '2017-01-30 17:34:38' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM tracking WHERE userID NOT IN (SELECT userID FROM active) */ ;;
-/*!50003 SET time_zone             = @saved_time_zone */ ;;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;;
-/*!50003 SET character_set_results = @saved_cs_results */ ;;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;;
-/*!50106 DROP EVENT IF EXISTS `wormholeClean` */;;
-DELIMITER ;;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
-/*!50003 SET character_set_client  = utf8mb4 */ ;;
-/*!50003 SET character_set_results = utf8mb4 */ ;;
-/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;;
-/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
-/*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `wormholeClean` ON SCHEDULE EVERY 1 MINUTE STARTS '2018-05-12 02:24:17' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
-
-UPDATE signatures SET modifiedByID = 0, modifiedByName = "Tripwire" WHERE DATE_ADD(lifeLeft, interval 0.1*lifeLength SECOND) < NOW() AND lifeLength <> 0 AND type = 'wormhole';
-
-DELETE FROM signatures WHERE DATE_ADD(lifeLeft, interval 0.1*lifeLength SECOND) < NOW() AND lifeLength <> 0 AND type = 'wormhole';
-
-DELETE FROM wormholes WHERE (not exists (select id from signatures s where s.id=wormholes.secondaryID)) or (not exists (select id from signatures s where s.id=wormholes.initialID));
-
-END */ ;;
-/*!50003 SET time_zone             = @saved_time_zone */ ;;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;;
-/*!50003 SET character_set_results = @saved_cs_results */ ;;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;;
-/*!50106 DROP EVENT IF EXISTS `wormholeCritical` */;;
-DELIMITER ;;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
-/*!50003 SET character_set_client  = utf8mb4 */ ;;
-/*!50003 SET character_set_results = utf8mb4 */ ;;
-/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
-/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;;
-/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
-/*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `wormholeCritical` ON SCHEDULE EVERY 1 MINUTE STARTS '2014-08-21 03:16:46' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
-
-
-
-UPDATE signatures s INNER JOIN wormholes w ON (s.id = initialID OR s.id = secondaryID) AND life = 'stable' SET modifiedByID = 0, modifiedByName = 'Tripwire', modifiedTime = NOW() WHERE s.type = 'wormhole' AND lifeLength <> '0' AND DATE_SUB(lifeLeft, INTERVAL 4 HOUR) < NOW();
-
-
-
-UPDATE wormholes w INNER JOIN signatures s ON (s.id = initialID OR s.id = secondaryID) AND (s.type = 'wormhole' AND life = 'stable' AND lifeLength <> '0' AND DATE_SUB(lifeLeft, INTERVAL 4 HOUR) < NOW()) SET life = 'critical';
-
-
-
-END */ ;;
-/*!50003 SET time_zone             = @saved_time_zone */ ;;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;;
-/*!50003 SET character_set_results = @saved_cs_results */ ;;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;;
+CREATE EVENT `activeClean`
+ON SCHEDULE EVERY 15 SECOND
+STARTS '2014-09-27 23:42:27'
+ON COMPLETION NOT PRESERVE
+ENABLE
+DO
+  DELETE FROM active WHERE DATE_ADD(time, INTERVAL 15 SECOND) < NOW();
+;;
 DELIMITER ;
-/*!50106 SET TIME_ZONE= @save_time_zone */ ;
+
+DROP EVENT IF EXISTS `flaresClean`;
+DELIMITER ;;
+CREATE EVENT `flaresClean`
+ON SCHEDULE EVERY 1 HOUR
+STARTS '2014-08-21 03:15:55'
+ON COMPLETION NOT PRESERVE
+ENABLE
+DO
+  DELETE FROM flares WHERE DATE_ADD(time, INTERVAL 24 HOUR) < NOW();
+;;
+DELIMITER ;
+
+DROP EVENT IF EXISTS `jumpsClean`;
+DELIMITER ;;
+CREATE EVENT `jumpsClean`
+ON SCHEDULE EVERY 1 HOUR
+STARTS '2017-01-27 04:24:28'
+ON COMPLETION NOT PRESERVE
+ENABLE
+DO
+  DELETE FROM `jumps`
+   WHERE wormholeID NOT IN (
+     SELECT id FROM wormholes WHERE type <> 'GATE'
+   );
+;;
+DELIMITER ;
+
+DROP EVENT IF EXISTS `signatureClean`;
+DELIMITER ;;
+CREATE EVENT `signatureClean`
+ON SCHEDULE EVERY 1 MINUTE
+STARTS '2018-05-11 15:57:18'
+ON COMPLETION NOT PRESERVE
+ENABLE
+DO
+BEGIN
+    UPDATE signatures
+      SET modifiedByID = 0, modifiedByName = "Tripwire"
+      WHERE lifeLeft < NOW()
+        AND lifeLength <> '0'
+        AND type <> 'wormhole';
+
+    DELETE FROM signatures
+      WHERE lifeLeft < NOW()
+        AND lifeLength <> '0'
+        AND type <> 'wormhole';
+END;;
+DELIMITER ;
+
+DROP EVENT IF EXISTS `trackingClean`;
+DELIMITER ;;
+CREATE EVENT `trackingClean`
+ON SCHEDULE EVERY 15 SECOND
+STARTS '2017-01-30 17:34:38'
+ON COMPLETION NOT PRESERVE
+ENABLE
+DO
+  DELETE FROM tracking WHERE userID NOT IN (SELECT userID FROM active);
+;;
+DELIMITER ;
+
+DROP EVENT IF EXISTS `wormholeClean`;
+DELIMITER ;;
+CREATE EVENT `wormholeClean`
+ON SCHEDULE EVERY 1 MINUTE
+STARTS '2018-05-12 02:24:17'
+ON COMPLETION NOT PRESERVE
+ENABLE
+DO
+BEGIN
+    UPDATE signatures s
+    INNER JOIN wormholes w ON (s.id = initialID OR s.id = secondaryID)
+      AND life = 'stable'
+      SET modifiedByID = 0,
+          modifiedByName = "Tripwire",
+          modifiedTime = NOW()
+      WHERE s.type = 'wormhole'
+        AND lifeLength <> '0'
+        AND DATE_SUB(lifeLeft, INTERVAL 4 HOUR) < NOW();
+
+    UPDATE wormholes w
+    INNER JOIN signatures s ON (s.id = initialID OR s.id = secondaryID)
+      AND (s.type = 'wormhole'
+           AND life = 'stable'
+           AND lifeLength <> '0'
+           AND DATE_SUB(lifeLeft, INTERVAL 4 HOUR) < NOW())
+      SET life = 'critical';
+
+    DELETE FROM signatures
+      WHERE DATE_ADD(lifeLeft, INTERVAL 0.1 * lifeLength SECOND) < NOW()
+        AND lifeLength <> 0
+        AND type = 'wormhole';
+
+    DELETE FROM wormholes
+      WHERE  NOT EXISTS (
+               SELECT id
+               FROM signatures s
+               WHERE s.id = wormholes.secondaryID
+             )
+         OR NOT EXISTS (
+               SELECT id
+               FROM signatures s
+               WHERE s.id = wormholes.initialID
+             );
+END;;
+DELIMITER ;
+
+DROP EVENT IF EXISTS `wormholeCritical`;
+DELIMITER ;;
+CREATE EVENT `wormholeCritical`
+ON SCHEDULE EVERY 1 MINUTE
+STARTS '2014-08-21 03:16:46'
+ON COMPLETION NOT PRESERVE
+ENABLE
+DO
+BEGIN
+    UPDATE signatures s
+    INNER JOIN wormholes w
+       ON (s.id = initialID OR s.id = secondaryID)
+       AND life = 'stable'
+      SET modifiedByID = 0,
+          modifiedByName = 'Tripwire',
+          modifiedTime = NOW()
+      WHERE s.type = 'wormhole'
+        AND lifeLength <> '0'
+        AND DATE_SUB(lifeLeft, INTERVAL 4 HOUR) < NOW();
+
+    UPDATE wormholes w
+    INNER JOIN signatures s
+       ON (s.id = initialID OR s.id = secondaryID)
+       AND s.type = 'wormhole'
+       AND life = 'stable'
+       AND lifeLength <> '0'
+       AND DATE_SUB(lifeLeft, INTERVAL 4 HOUR) < NOW()
+      SET life = 'critical';
+END;;
+DELIMITER ;
 
 --
--- Dumping routines for database 'tripwire'
+-- Cleanup
 --
+
+/*!50106 SET TIME_ZONE= @save_time_zone */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
