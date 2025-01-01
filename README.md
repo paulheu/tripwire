@@ -56,17 +56,6 @@ Setup:
 - Modify the constants with your own settings in both files
 - Prep traefik acme file
 
-**docker-compose.yml**
-edit the following items with your information
-```
-  - "--certificatesresolvers.myresolver.acme.email=your@email.com"
-  - "traefik.http.routers.nginx.rule=Host(`your domain`)"
-  - "traefik.http.routers.nginxweb_http.rule=Host(`your domain`)"
-  - MYSQL_ROOT_PASSWORD="any root password you want, don't use quotes"
-  - MYSQL_USER="any non root user you want, also no quotes"
-  - MYSQL_PASSWORD="any non root password you want, still no quotes"
-  - DB_ROOT_PASS="same root password as before, still no quotes"
-```
 
 **SSO**
 ```
@@ -81,6 +70,23 @@ edit the following items with your information
     - esi-location.read_online.v1
     - esi-characters.read_titles.v1
     - esi-search.search_structures.v1
+```
+
+**docker-compose.yml**
+edit the following items with your information
+```
+under Traefik:
+  - "--certificatesresolvers.myresolver.acme.email=your@email.com"
+
+under nginx
+  - "traefik.http.routers.nginx.rule=Host(`your domain`)"
+  - "traefik.http.routers.nginxweb_http.rule=Host(`your domain`)"
+
+under mysql
+  - MYSQL_ROOT_PASSWORD="any root password you want, don't use quotes"
+  - MYSQL_USER="any non root user you want, also no quotes"
+  - MYSQL_PASSWORD="any non root password you want, still no quotes"
+  - DB_ROOT_PASS="same root password as before, still no quotes"
 ```
 
 **db.inc.php**
