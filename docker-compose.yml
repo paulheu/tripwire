@@ -106,6 +106,7 @@ services:
       - mysql
     networks:
       - tripwire
+    environment:  
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_ROOT_USER=root
