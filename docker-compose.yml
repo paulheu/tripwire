@@ -80,9 +80,6 @@ services:
       - MYSQL_PASSWORD=anonrootpassword # do not use quotes
     volumes:
       - mysql-data:/var/lib/mysql
-    entrypoint: sh -c "/tmp/init.sh && echo 'starting mysql...' && /docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
-
-  # Development only - For database administration
 
   #################################################################
   # ADMINER SERVICE (DB web UI)
@@ -123,3 +120,4 @@ volumes:
 networks:
   web:
   tripwire:
+  
