@@ -34,7 +34,7 @@ services:
     ports:
       - 8081:80
     networks:
-      # - web #- Used with Traefik
+      - web
       - tripwire
     labels:
       - "traefik.enable=true"
