@@ -121,6 +121,7 @@ paste this into cron:
 
 
 **General**
+
 To view logs in real time run `docker-compose logs -f`
 To start the stack run `docker-compose up -d --build`
 
