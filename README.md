@@ -113,11 +113,7 @@ chmod 600 traefik-data/acme.json
 
 **CRON**
 ```
-crontab -e
-
-paste this into cron:
-0 * * * * docker exec -t php-fpm php /opt/app/system_activity.cron.php
-*/3 * * * * docker exec -t  php-fpm php /opt/app/account_update.cron.php
+crontab -l | cat - crontab-tw.txt >/tmp/crontab.txt && crontab /tmp/crontab.txt
 ```
 
 
