@@ -66,10 +66,9 @@ services:
       - "./:/opt/app"
 
   #################################################################
-  # OFFICIAL MYSQL 5.7 SERVICE
+  # OFFICIAL MYSQL 8.0.40 SERVICE
   #################################################################
   mysql:
-#    image: mysql:5.7
     image: mysql:8.0.40
     container_name: mysql
     networks:
