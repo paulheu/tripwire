@@ -33,10 +33,10 @@ cp db.inc.docker.example.php db.inc.php
 cp config.example.php config.php
 
 #set up config
-sed -i -e "s/email=your@email.com/$ADM_EMAIL/g; s/your domain/$TRDOMAIN/g; s/\(apasswordforroot\|samerootpasswordasabove\)/$MYSQL_ROOT_PASSWO/g; s/norootuser/$MYSQL_USER/g; s/anonrootpassword/$MYSQL_PASSWORDWhy/g" ./docker-compose.yml
+sed -i -e "s/your@email.com/$ADM_EMAIL/g; s/your domain/$TRDOMAIN/g; s/\(apasswordforroot\|samerootpasswordasabove\)/$MYSQL_ROOT_PASSWO/g; s/norootuser/$MYSQL_USER/g; s/anonrootpassword/$MYSQL_PASSWORD/g" ./docker-compose.yml
 sed -i -e "s/usernamefromdockercompose/$MYSQL_USER/g; s/userpasswordfromdockercompose/$MYSQL_PASSWORD/g" ./db.inc.php
 sed -i -e "s/\(your domain\|yourdomain\)/$TRDOMAIN/g; s/adminEmail@example.com/$ADM_EMAIL/g; s/client/$SSO_CLIENT/g; s/secret/$SSO_SECRET/g" ./config.php
 
 
 #add crontab entries
-crontab -l | cat - crontab-tw.txt >crontab.txt && crontab crontab.txt
+crontab -l | cat - crontab-tw.txt >/tmp/crontab.txt && crontab /tmp/crontab.txt
