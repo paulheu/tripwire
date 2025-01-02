@@ -123,6 +123,8 @@ paste this into cron:
 
 **General**
 
+A quick and dirty setup script is provided `./setup.sh`
+
 To view logs in real time run `docker compose logs -f`
 
 To start the stack run `docker compose up -d --build`
