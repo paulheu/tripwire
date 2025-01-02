@@ -50,7 +50,6 @@ Setup:
 - Setup Developer application on Eve developers
 - Configure your domain registrar with a record pointed to the vm you are using -- ensure port 80/443 are open (80 can be closed after traefik setup)
 - Clone repo and change directory into it
-- Update docker-compose
 - Copy db.inc.docker.example.php to db.inc.php
 - Copy config.example.php to config.php
 - Modify the constants with your own settings in both files
@@ -125,9 +124,9 @@ paste this into cron:
 
 **General**
 
-To view logs in real time run `docker-compose logs -f`
+To view logs in real time run `docker compose logs -f`
 
-To start the stack run `docker-compose up -d --build`
+To start the stack run `docker compose up -d --build`
 
 
 
