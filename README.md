@@ -85,7 +85,6 @@ under mysql
   - MYSQL_ROOT_PASSWORD="any root password you want, don't use quotes"
   - MYSQL_USER="any non root user you want, also no quotes"
   - MYSQL_PASSWORD="any non root password you want, still no quotes"
-  - DB_ROOT_PASS="same root password as before, still no quotes"
 
 under db-seed
   - DB_ROOT_PASS=the same ROOT password as under sql
